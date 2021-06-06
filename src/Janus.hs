@@ -9,14 +9,13 @@ module Janus
   )
 where
 
+import Prelude
+
 someFunc :: IO ()
 someFunc = putStrLn ("someFunc" :: String)
 
 -- An instantaneous point on the time-line.
 data Instant = Instant
-
--- A time-based amount of time, such as '34.5 seconds'.
-data Duration = Duration
 
 -- A date without a time-zone in the ISO-8601 calendar system, such as 2007-12-03.
 data LocalDate = LocalDate

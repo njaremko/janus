@@ -1,4 +1,4 @@
-cabal-version:       2.4
+cabal-version:       3.0
 name:                janus
 version:             0.0.0.0
 synopsis:            See README for more info
@@ -21,10 +21,7 @@ source-repository head
 
 common common-options
   build-depends:       base ^>= 4.14.0.0
-                     , relude
-  
-  mixins:              base hiding (Prelude)
-                     , relude (Relude as Prelude)
+                     , text
   
   ghc-options:         -Wall
                        -Wcompat
@@ -40,6 +37,11 @@ common common-options
                        -Wpartial-fields
   if impl(ghc >= 8.8)
     ghc-options:       -Wmissing-deriving-strategies
+                       -fwrite-ide-info
+                       -hiedir=.hie
+                       -haddock
+
+  default-extensions:  ApplicativeDo BangPatterns ConstraintKinds DataKinds DefaultSignatures DeriveFoldable DeriveFunctor DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies DuplicateRecordFields EmptyCase ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns NoImplicitPrelude NumericUnderscores OverloadedStrings PatternSynonyms RankNTypes ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeFamilyDependencies TypeOperators
 
   default-language:    Haskell2010
 
@@ -47,6 +49,8 @@ library
   import:              common-options
   hs-source-dirs:      src
   exposed-modules:     Janus
+                    ,  Janus.Units
+                    ,  Janus.Duration
 
 executable janus
   import:              common-options
