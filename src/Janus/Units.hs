@@ -29,3 +29,40 @@ nanosPerHour = nanosPerMinute * minutesPerHour
 
 nanosPerDay :: Int64
 nanosPerDay = nanosPerHour * hoursPerDay
+
+-- A date-based amount of time in the ISO-8601 calendar system, such as '2 years, 3 months and 4 days'.
+data Period = Period
+
+-- A year in the ISO-8601 calendar system, such as 2007.
+data Year = Year
+
+-- A year-month in the ISO-8601 calendar system, such as 2007-12.
+data YearMonth = YearMonth {
+       year :: Year,
+       month :: Month
+}
+
+-- A month-of-year, such as 'July'.
+data Month
+  = January
+  | February
+  | March
+  | April
+  | May
+  | June
+  | July
+  | August
+  | September
+  | October
+  | November
+  | December
+
+-- A day-of-week, such as 'Tuesday'.
+data DayOfWeek
+  = Monday
+  | Tuesday
+  | Wednesday
+  | Thursday
+  | Friday
+  | Saturday
+  | Sunday

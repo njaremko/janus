@@ -4,7 +4,7 @@
 {-# LANGUAGE TypeApplications #-}
 
 module Janus.Duration
-  ( Duration (..),
+  ( Duration,
     ofDays,
     ofSeconds,
     ofSecondsWithAdjustment,
@@ -12,13 +12,24 @@ module Janus.Duration
     ofMinutes,
     ofMillis,
     ofNanos,
+    plus,
+    minus,
+    isZero,
+    between
   )
 where
 
 import Data.Int (Int64)
 import Janus.Units
-    ( secondsPerMinute, secondsPerHour, secondsPerDay, nanosPerSecond )
+  ( nanosPerSecond,
+    secondsPerDay,
+    secondsPerHour,
+    secondsPerMinute,
+  )
 import Prelude
+import Data.Ix (Ix)
+import Janus.Temporal (Temporal)
+import qualified Janus.Temporal as Temporal
 
 -- A time-based amount of time, such as '34.5 seconds'.
 data Duration = Duration
@@ -27,7 +38,13 @@ data Duration = Duration
     -- The number of nanoseconds in the duration, expressed as a fraction of the
     -- number of seconds. This is always positive, and never exceeds 999,999,999.
     nanos :: Int
-  }
+  } deriving stock (Show, Eq, Ord, Bounded, Ix)
+
+instance Semigroup Duration where
+  (<>) = plus
+
+instance Monoid Duration where
+  mempty = Duration 0 0
 
 ofDays :: Int64 -> Duration
 ofDays days =
@@ -97,3 +114,27 @@ ofNanos nanos =
             { seconds = secs,
               nanos = nos
             }
+
+isZero :: Duration -> Bool
+isZero Duration {seconds, nanos} = seconds == 0 && nanos == 0
+
+plus :: Duration -> Duration -> Duration
+plus
+  d1@Duration {seconds = s1, nanos = n1}
+  d2@Duration {seconds = s2, nanos = n2}
+    | isZero d1 = d2
+    | isZero d2 = d1
+    | otherwise =
+      let epochSec = s1 + s2
+          seconds = epochSec + (fromIntegral n2 `div` nanosPerSecond)
+          nanosToAdd = (fromIntegral n2 `mod` nanosPerSecond)
+          nanos = fromIntegral n1 + nanosToAdd
+       in ofSecondsWithAdjustment seconds nanos
+
+minus :: Duration -> Duration -> Duration
+minus
+  d1
+  Duration {seconds = s2, nanos = n2} = plus d1 (Duration (- s2) (- n2))
+
+between :: (Temporal a b) => a -> b -> Duration
+between t1 t2 = ofNanos(Temporal.until t1 t2)
