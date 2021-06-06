@@ -1,6 +1,6 @@
 cabal-version:       3.0
 name:                janus
-version:             0.0.0.0
+version:             0.0.0.1
 synopsis:            See README for more info
 description:         See README for more info
 homepage:            https://github.com/njaremko/janus
@@ -51,6 +51,16 @@ library
   exposed-modules:     Janus
                     ,  Janus.Units
                     ,  Janus.Duration
+                    ,  Janus.Instant
+                    ,  Janus.LocalDate
+                    ,  Janus.LocalDateTime
+                    ,  Janus.LocalTime
+                    ,  Janus.OffsetDateTime
+                    ,  Janus.OffsetTime
+                    ,  Janus.Temporal
+                    ,  Janus.TimeOffset
+                    ,  Janus.TimeZone
+                    ,  Janus.ZonedDateTime
 
 executable janus
   import:              common-options
