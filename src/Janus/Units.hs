@@ -1,7 +1,7 @@
 module Janus.Units where
 
-import Prelude
 import Data.Int (Int64)
+import Prelude
 
 secondsPerMinute :: Int64
 secondsPerMinute = 60
@@ -34,13 +34,24 @@ nanosPerDay = nanosPerHour * hoursPerDay
 data Period = Period
 
 -- A year in the ISO-8601 calendar system, such as 2007.
-data Year = Year
+newtype Year = Year {unYear :: Int} deriving newtype (Enum, Num, Eq, Ord, Real, Integral)
+newtype Day = Day {unDay :: Int} deriving newtype (Enum, Num, Eq, Ord, Real, Integral)
+newtype Hour = Hour {unHour :: Int} deriving newtype (Enum, Num, Eq, Ord, Real, Integral)
+newtype Minute = Minute {unMinute :: Int} deriving newtype (Enum, Num, Eq, Ord, Real, Integral)
+newtype Second = Second {unSecond :: Int} deriving newtype (Enum, Num, Eq, Ord, Real, Integral)
+newtype Nano = Nano {unNano :: Int} deriving newtype (Enum, Num, Eq, Ord, Real, Integral)
 
 -- A year-month in the ISO-8601 calendar system, such as 2007-12.
-data YearMonth = YearMonth {
-       year :: Year,
-       month :: Month
-}
+data YearMonth = YearMonth
+  { year :: Year,
+    month :: Month
+  }
+
+-- A month-day in the ISO-8601 calendar system, such as --12-03.
+data MonthDay = MonthDay
+  { month :: Month,
+    day :: Int
+  }
 
 -- A month-of-year, such as 'July'.
 data Month
@@ -57,6 +68,21 @@ data Month
   | November
   | December
 
+monthToInt :: Month -> Int
+monthToInt January = 1
+monthToInt February = 2
+monthToInt March = 3
+monthToInt April = 4
+monthToInt May = 5
+monthToInt June = 6
+monthToInt July = 7
+monthToInt August = 8
+monthToInt September = 9
+monthToInt October = 10
+monthToInt November = 11
+monthToInt December = 12
+
+
 -- A day-of-week, such as 'Tuesday'.
 data DayOfWeek
   = Monday
@@ -66,3 +92,11 @@ data DayOfWeek
   | Friday
   | Saturday
   | Sunday
+
+data ChronoUnit
+  = Nanos Int64
+  | Micros Int64
+  | Millis Int64
+  | Seconds Int64
+  | Minutes Int64
+  | Hours Int64

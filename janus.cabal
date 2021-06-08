@@ -21,6 +21,8 @@ source-repository head
 
 common common-options
   build-depends:       base ^>= 4.14.0.0
+                     , time
+                     , attoparsec
                      , text
   
   ghc-options:         -Wall
@@ -58,7 +60,7 @@ library
                     ,  Janus.OffsetDateTime
                     ,  Janus.OffsetTime
                     ,  Janus.Temporal
-                    ,  Janus.TimeOffset
+                    ,  Janus.Offset
                     ,  Janus.TimeZone
                     ,  Janus.ZonedDateTime
 
