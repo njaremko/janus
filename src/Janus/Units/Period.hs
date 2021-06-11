@@ -16,12 +16,12 @@ module Janus.Units.Period
     multipliedBy,
     negate,
     toTotalMonths,
-    normalize
+    normalize,
   )
 where
 
-import Prelude hiding (negate)
 import Data.Int (Int64)
+import Prelude hiding (negate)
 
 -- A date-based amount of time in the ISO-8601 calendar system, such as '2 years, 3 months and 4 days'.
 data Period = Period
@@ -31,7 +31,10 @@ data Period = Period
   }
 
 instance Semigroup Period where
-  (<>) a b = a
+  (<>)
+    Period {years = y1, months = m1, days = d1}
+    Period {years = y2, months = m2, days = d2} =
+      Period {years = y1 + y2, months = m1 + m2, days = d1 + d2}
 
 instance Monoid Period where
   mempty = Period 0 0 0
@@ -83,7 +86,7 @@ minusYears yearsToSub p = plusYears (- yearsToSub) p
 
 multipliedBy :: Int -> Period -> Period
 multipliedBy 1 p = p
-multipliedBy _ Period{years=0,months=0,days=0} = mempty
+multipliedBy _ Period {years = 0, months = 0, days = 0} = mempty
 multipliedBy scalar Period {years, months, days} =
   Period
     { years = years * scalar,
@@ -95,14 +98,13 @@ negate :: Period -> Period
 negate = multipliedBy (-1)
 
 toTotalMonths :: Period -> Int64
-toTotalMonths Period{years,months} = fromIntegral $ years * 12 + months
+toTotalMonths Period {years, months} = fromIntegral $ years * 12 + months
 
 normalize :: Period -> Period
-normalize p@Period{years,months} = let 
-    totalMonths = toTotalMonths p 
-    splitYears = totalMonths `div` 12
-    splitMonths :: Int = fromIntegral $ totalMonths `mod` 12
-    in 
-        if splitYears == fromIntegral years && splitMonths == months
-            then p
-            else p {years=fromIntegral splitYears, months=splitMonths}
+normalize p@Period {years, months} =
+  let totalMonths = toTotalMonths p
+      splitYears = totalMonths `div` 12
+      splitMonths :: Int = fromIntegral $ totalMonths `mod` 12
+   in if splitYears == fromIntegral years && splitMonths == months
+        then p
+        else p {years = fromIntegral splitYears, months = splitMonths}
