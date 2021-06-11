@@ -8,6 +8,12 @@ module Janus.LocalTime
     withNano,
     plusNanos,
     plusSeconds,
+    plusMinutes,
+    plusHours,
+    minusSeconds,
+    minusMinutes,
+    minusHours,
+    minusNanos,
   )
 where
 
@@ -103,3 +109,35 @@ plusSeconds secondsToAdd time@LocalTime {hour, minute, second} =
               newMinute = Minute.unsafeMkMinute $ newSofd `div` 60 `mod` 60
               newSecond = Second.unsafeMkSecond $ newSofd `mod` 60
            in time {hour = newHour, minute = newMinute, second = newSecond}
+
+plusMinutes :: Int64 -> LocalTime -> LocalTime
+plusMinutes 0 time = time
+plusMinutes minutesToAdd time@LocalTime {hour, minute} =
+  let mofd :: Int = Hour.toInt hour * 60 + Minute.toInt minute
+      newMofd :: Int = fromIntegral ((minutesToAdd `mod` 1440) + fromIntegral mofd + 1440) `mod` 1440
+   in if mofd == newMofd
+        then time
+        else
+          let newHour = Hour.unsafeMkHour $ newMofd `div` 60
+              newMinute = Minute.unsafeMkMinute $ newMofd `mod` 60
+           in time {hour = newHour, minute = newMinute}
+
+plusHours :: Int64 -> LocalTime -> LocalTime
+plusHours 0 time = time
+plusHours hoursToAdd time@LocalTime {hour} =
+  let newHour =
+        Hour.unsafeMkHour $
+          ((hoursToAdd `mod` 24) + Hour.toInt hour + 24) `mod` 24
+   in time {hour = newHour}
+
+minusHours :: Int64 -> LocalTime -> LocalTime
+minusHours hoursToSubtract = plusHours (- (hoursToSubtract `mod` 24))
+
+minusMinutes :: Int64 -> LocalTime -> LocalTime
+minusMinutes minutesToSubtract = plusMinutes (- (minutesToSubtract `mod` 1440))
+
+minusSeconds :: Int64 -> LocalTime -> LocalTime
+minusSeconds secondsToSubtract = plusSeconds (- (secondsToSubtract `mod` 86400))
+
+minusNanos :: Int64 -> LocalTime -> LocalTime
+minusNanos nanosToSubtract = plusNanos (- (nanosToSubtract `mod` 86400000000000))
