@@ -8,6 +8,7 @@ module Janus.Units.Month
     length,
     plus,
     minus,
+    unsafeFromOrdinal
   )
 where
 
@@ -37,7 +38,7 @@ data Month
       Ord
     )
 
-toOrdinal :: Month -> Int
+toOrdinal :: (Integral a) => Month -> a
 toOrdinal January = 1
 toOrdinal February = 2
 toOrdinal March = 3
@@ -51,7 +52,7 @@ toOrdinal October = 10
 toOrdinal November = 11
 toOrdinal December = 12
 
-fromOrdinal :: Int -> Maybe Month
+fromOrdinal :: (Integral a) => a -> Maybe Month
 fromOrdinal 1 = Just January
 fromOrdinal 2 = Just February
 fromOrdinal 3 = Just March
@@ -66,7 +67,7 @@ fromOrdinal 11 = Just November
 fromOrdinal 12 = Just December
 fromOrdinal _ = Nothing
 
-unsafeFromOrdinal :: Int -> Month
+unsafeFromOrdinal :: (Integral a, Show a) => a -> Month
 unsafeFromOrdinal idx =
   case fromOrdinal idx of
     Just m -> m
@@ -90,7 +91,7 @@ monthStartDayOfYear isLeapYear month =
     firstDayOfMonthOfYear November x = 305 + x
     firstDayOfMonthOfYear December x = 335 + x
 
-minLength :: Month -> Int
+minLength :: (Integral a) =>  Month -> a
 minLength February = 28
 minLength April = 30
 minLength June = 30
@@ -98,7 +99,7 @@ minLength September = 30
 minLength November = 30
 minLength _ = 31
 
-maxLength :: Month -> Int
+maxLength :: (Integral a) =>  Month -> a
 maxLength February = 29
 maxLength April = 30
 maxLength June = 30
@@ -106,7 +107,7 @@ maxLength September = 30
 maxLength November = 30
 maxLength _ = 31
 
-length :: Bool -> Month -> Int
+length :: (Integral a) => Bool -> Month -> a
 length isLeapYear February = if isLeapYear then 29 else 28
 length _ April = 30
 length _ June = 30
@@ -114,10 +115,10 @@ length _ September = 30
 length _ November = 30
 length _ _ = 31
 
-plus :: Int -> Month -> Month
+plus :: (Integral a, Show a) => a -> Month -> Month
 plus toAdd month =
   let amount = toAdd `mod` 12
    in unsafeFromOrdinal ((toOrdinal month + amount + 12) `mod` 12)
 
-minus :: Int -> Month -> Month
+minus :: (Integral a, Show a) => a -> Month -> Month
 minus toSub = plus (- (toSub `mod` 12))

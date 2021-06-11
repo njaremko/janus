@@ -1,8 +1,11 @@
-module Janus.Units.Year where
+module Janus.Units.Year (
+    Year, mkYear, toInt, length, isLeapYear,unsafeMkYear
+    ) where
 
-import Prelude hiding (length)
+import Data.Bits (Bits, (.&.))
 import Data.Ix (Ix)
-import Data.Bits ((.&.), Bits)
+import Prelude hiding (length)
+import Data.Maybe (fromMaybe)
 
 -- A year in the ISO-8601 calendar system, such as 2007.
 newtype Year = Year Int
@@ -15,12 +18,17 @@ newtype Year = Year Int
       Eq,
       Ord,
       Real,
-      Integral,
       Bits
     )
 
-mkYear :: Int -> Maybe Year
-mkYear year = if year < 0 then Nothing else Just (Year year)
+mkYear :: (Integral a) => a -> Maybe Year
+mkYear year = if -999999999 <= year && year <= 999999999 then Just (Year $ fromIntegral year) else Nothing
+
+unsafeMkYear :: (Integral a) => a -> Year
+unsafeMkYear year = fromMaybe (error "") $ mkYear year
+
+toInt :: (Integral a) => Year -> a
+toInt (Year a) = fromIntegral a
 
 length :: Year -> Int
 length y = if isLeapYear y then 366 else 365
@@ -31,4 +39,4 @@ length y = if isLeapYear y then 366 else 365
 -- True
 isLeapYear :: Year -> Bool
 isLeapYear prolepticYear =
-  prolepticYear .&. 3 == 0 && (prolepticYear `mod` 100 /= 0 || prolepticYear `mod` 400 == 0)
+  prolepticYear .&. 3 == 0 && (toInt @Int prolepticYear `mod` 100 /= 0 || toInt @Int prolepticYear `mod` 400 == 0)

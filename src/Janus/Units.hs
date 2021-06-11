@@ -34,6 +34,7 @@ import Data.Ix (Ix)
 import Prelude
 import Janus.Units.Month (Month)
 import Janus.Units.Year (Year, mkYear)
+import Janus.Units.Day (Day, mkDay)
 
 secondsPerMinute :: Int64
 secondsPerMinute = 60
@@ -64,22 +65,6 @@ nanosPerDay = nanosPerHour * hoursPerDay
 
 -- A date-based amount of time in the ISO-8601 calendar system, such as '2 years, 3 months and 4 days'.
 data Period = Period
-
-newtype Day = Day Int
-  deriving newtype
-    ( Show,
-      Bounded,
-      Ix,
-      Enum,
-      Num,
-      Eq,
-      Ord,
-      Real,
-      Integral
-    )
-
-mkDay :: Int -> Maybe Day
-mkDay day = if 1 <= day && day <= 31 then Just (Day day) else Nothing
 
 newtype Hour = Hour Int
   deriving newtype

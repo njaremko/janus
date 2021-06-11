@@ -4,6 +4,7 @@ module Janus.Instant
     ofEpochSecond,
     ofEpochMilli,
     parseIso8601,
+    toYMD,
   )
 where
 
@@ -17,8 +18,10 @@ import Data.Ix (Ix)
 import Data.Maybe (fromMaybe)
 import Data.Time.Clock.System (SystemTime (MkSystemTime), getSystemTime)
 import Janus.Units
-import Prelude
+import qualified Janus.Units.Day as Day
 import qualified Janus.Units.Month as Month
+import qualified Janus.Units.Year as Year
+import Prelude
 
 -- An instantaneous point on the time-line.
 data Instant = Instant
@@ -41,17 +44,17 @@ ofEpochSecond :: EpochSecond -> Instant
 ofEpochSecond seconds = Instant {seconds, nanos = 0}
 
 ofEpochMilli :: EpochSecond -> Instant
-ofEpochMilli ms = let
-    seconds = ms `div` 1000
-    mos :: Nano = fromIntegral (ms `mod` 1000)
-  in Instant {seconds, nanos = mos * 1_000_000}
+ofEpochMilli ms =
+  let seconds = ms `div` 1000
+      mos :: Nano = fromIntegral (ms `mod` 1000)
+   in Instant {seconds, nanos = mos * 1_000_000}
 
 -- >>> mkInstantWithOffset 2020 February 29 6 0 3 0 (-60)
 -- Instant {seconds = 1582955943, nanos = 0}
 mkInstantWithOffset :: Year -> Month -> Day -> Hour -> Minute -> Second -> Nano -> Int64 -> Instant
 mkInstantWithOffset year month day hour minute seconds nanos offsetSeconds =
-  let epochDays = epochDaysFromYMD (fromIntegral year) (Month.toOrdinal month) (fromIntegral day)
-      epochDaySeconds = secondsPerDay * fromIntegral epochDays
+  let epochDays :: Int64 = epochDaysFromYMD year month day
+      epochDaySeconds = secondsPerDay * epochDays
    in Instant
         { seconds = EpochSecond $ epochDaySeconds + (secondsPerHour * fromIntegral hour) + (secondsPerMinute * fromIntegral minute) + fromIntegral seconds + offsetSeconds,
           nanos
@@ -59,9 +62,12 @@ mkInstantWithOffset year month day hour minute seconds nanos offsetSeconds =
 
 -- This is counter intuitive, but it's correct.
 -- http://howardhinnant.github.io/date_algorithms.html
-epochDaysFromYMD :: (Integral a) => a -> a -> a -> a
-epochDaysFromYMD y month day =
-  let year = y - (if month <= 2 then 1 else 0)
+epochDaysFromYMD :: (Integral a) => Year -> Month -> Day -> a
+epochDaysFromYMD y m d =
+  let y1 = Year.toInt y
+      month = Month.toOrdinal m
+      day = Day.toInt d
+      year = y1 - (if month <= 2 then 1 else 0)
       era =
         ( if 0 <= year
             then year
@@ -75,6 +81,19 @@ epochDaysFromYMD y month day =
       -- day of era
       doe = yoe * 365 + yoe `div` 4 - yoe `div` 100 + doy
    in era * 146097 + doe - 719468
+
+toYMD :: Instant -> (Year, Month, Day)
+toYMD Instant {seconds} =
+  let z = seconds + 719468
+      era = (if 0 <= z then z else z - 146096) `div` 146097
+      doe = z - era * 146097
+      yoe = (doe - doe `div` 1460 + doe `div` 36524 - doe `div` 146096) `div` 365
+      y = yoe + era * 400
+      doy = doe - (365 * yoe + yoe `div` 4 - yoe `div` 100)
+      mp = (5 * doy + 2) `div` 153
+      d = doy - (153 * mp + 2) `div` 5 + 1
+      m = mp + (if mp < 10 then 3 else -9)
+   in (fromIntegral (y + if m <= 2 then 1 else 0), Month.unsafeFromOrdinal m, fromIntegral d)
 
 -- Parses timezone into offset seconds
 timeZone :: Parser (Maybe Int64)

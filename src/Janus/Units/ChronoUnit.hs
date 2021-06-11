@@ -16,6 +16,7 @@ data ChronoUnit
   | Seconds
   | Minutes
   | Hours
+  | HalfDays
   | Days
   | Weeks
   | Months
@@ -41,6 +42,7 @@ length Millis = Duration.ofNanos 1_000_000
 length Seconds = Duration.ofSeconds 1
 length Minutes = Duration.ofSeconds 60
 length Hours = Duration.ofSeconds 3600
+length HalfDays = Duration.ofSeconds 43_200
 length Days = Duration.ofSeconds 86_400
 length Weeks = Duration.ofSeconds 604_800
 length Months = Duration.ofSeconds 2_629_746

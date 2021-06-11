@@ -5,6 +5,7 @@ where
 
 import Data.Word (Word8)
 import Prelude
+import Data.Ix (Ix)
 
 -- A time without a time-zone in the ISO-8601 calendar system, such as 10:15:30.
 data LocalTime = LocalTime
@@ -12,4 +13,4 @@ data LocalTime = LocalTime
     minute :: Word8,
     seconds :: Word8,
     nano :: Int
-  }
+  } deriving stock (Show, Eq, Ord, Bounded, Ix)
