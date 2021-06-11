@@ -38,6 +38,7 @@ import Janus.Units.Month (Month)
 import Janus.Units.Year (Year, mkYear)
 import Janus.Units.Second (Second, mkSecond)
 import Janus.Units.Nano (Nano, mkNano)
+import Janus.Units.Period (Period)
 import Prelude
 
 secondsPerMinute :: Int64
@@ -76,9 +77,6 @@ nanosPerHour = nanosPerMinute * minutesPerHour
 -- 86400000000000
 nanosPerDay :: Int64
 nanosPerDay = nanosPerHour * hoursPerDay
-
--- A date-based amount of time in the ISO-8601 calendar system, such as '2 years, 3 months and 4 days'.
-data Period = Period
 
 newtype EpochSecond = EpochSecond Int64
   deriving newtype

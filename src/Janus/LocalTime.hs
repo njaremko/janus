@@ -1,7 +1,10 @@
 module Janus.LocalTime
   ( LocalTime,
+    mkLocalTime,
     ofSecondOfDay,
+    toSecondOfDay,
     ofNanoOfDay,
+    toNanoOfDay,
     withHour,
     withMinute,
     withSecond,
@@ -35,6 +38,9 @@ data LocalTime = LocalTime
   }
   deriving stock (Show, Eq, Ord, Bounded, Ix)
 
+mkLocalTime :: Hour -> Minute -> Second -> Nano -> LocalTime
+mkLocalTime = LocalTime
+
 withHour :: Hour -> LocalTime -> LocalTime
 withHour hour d = d {hour}
 
@@ -46,6 +52,10 @@ withSecond second d = d {second}
 
 withNano :: Nano -> LocalTime -> LocalTime
 withNano nano d = d {nano}
+
+toSecondOfDay :: LocalTime -> Int64
+toSecondOfDay LocalTime {hour, minute, second} =
+  Hour.toInt hour * 3600 + Minute.toInt minute * 60 + Second.toInt second
 
 ofSecondOfDay :: Int64 -> LocalTime
 ofSecondOfDay secondOfDay =
@@ -61,7 +71,8 @@ ofSecondOfDay secondOfDay =
 
 toNanoOfDay :: LocalTime -> Int64
 toNanoOfDay LocalTime {hour, minute, second, nano} =
-  (Hour.toInt hour * nanosPerHour) + (Minute.toInt minute * nanosPerMinute)
+  (Hour.toInt hour * nanosPerHour)
+    + (Minute.toInt minute * nanosPerMinute)
     + (Second.toInt second * nanosPerSecond)
     + Nano.toInt nano
 
