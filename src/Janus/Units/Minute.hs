@@ -18,8 +18,7 @@ newtype Minute = Minute Int
       Enum,
       Num,
       Eq,
-      Ord,
-      Real
+      Ord
     )
 
 mkMinute :: (Integral a) => a -> Maybe Minute

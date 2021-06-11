@@ -18,8 +18,7 @@ newtype Second = Second Int
       Enum,
       Num,
       Eq,
-      Ord,
-      Real
+      Ord
     )
 
 mkSecond :: (Integral a) => a -> Maybe Second

@@ -13,8 +13,7 @@ newtype Day = Day Word8
       Enum,
       Num,
       Eq,
-      Ord,
-      Real
+      Ord
     )
 
 mkDay :: (Integral a) => a -> Maybe Day

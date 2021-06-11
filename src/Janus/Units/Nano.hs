@@ -18,8 +18,7 @@ newtype Nano = Nano Int
       Enum,
       Num,
       Eq,
-      Ord,
-      Real
+      Ord
     )
 
 mkNano :: (Integral a) => a -> Maybe Nano

@@ -19,8 +19,7 @@ newtype Hour = Hour Word8
       Enum,
       Num,
       Eq,
-      Ord,
-      Real
+      Ord
     )
 
 mkHour :: (Integral a) => a -> Maybe Hour

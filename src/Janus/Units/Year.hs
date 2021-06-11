@@ -17,7 +17,6 @@ newtype Year = Year Int
       Num,
       Eq,
       Ord,
-      Real,
       Bits
     )
 
