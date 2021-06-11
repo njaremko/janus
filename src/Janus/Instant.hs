@@ -20,6 +20,9 @@ import Data.Time.Clock.System (SystemTime (MkSystemTime), getSystemTime)
 import Janus.Units
 import qualified Janus.Units.Day as Day
 import qualified Janus.Units.Month as Month
+import qualified Janus.Units.Hour as Hour
+import qualified Janus.Units.Minute as Minute
+import qualified Janus.Units.Second as Second
 import qualified Janus.Units.Year as Year
 import Prelude
 
@@ -56,7 +59,7 @@ mkInstantWithOffset year month day hour minute seconds nanos offsetSeconds =
   let epochDays :: Int64 = epochDaysFromYMD year month day
       epochDaySeconds = secondsPerDay * epochDays
    in Instant
-        { seconds = EpochSecond $ epochDaySeconds + (secondsPerHour * fromIntegral hour) + (secondsPerMinute * fromIntegral minute) + fromIntegral seconds + offsetSeconds,
+        { seconds = EpochSecond $ epochDaySeconds + (secondsPerHour * Hour.toInt hour) + (secondsPerMinute * Minute.toInt minute) + Second.toInt seconds + offsetSeconds,
           nanos
         }
 
@@ -131,10 +134,10 @@ parseIso8601 = do
   d <- twoDigits <|> fail "date must be of form [+,-]YYYY-MM-DD"
   _ <- daySep
   h <- twoDigits
-  minute <- char ':' *> twoDigits
-  (s, ns) <- option (0, 0) (char ':' *> parseSeconds)
+  minutes <- char ':' *> twoDigits
+  (s, nanos) <- option (0, 0) (char ':' *> parseSeconds)
   offset <- timeZone
-  case (mkYear y, Month.fromOrdinal m, mkDay d, mkHour h, mkMinute minute, mkSecond s, mkNano ns) of
+  case (mkYear y, Month.fromOrdinal m, mkDay d, mkHour h, mkMinute minutes, mkSecond s, mkNano nanos) of
     (Just year, Just month, Just day, Just hour, Just minute, Just second, Just ns) ->
       return $
         mkInstantWithOffset

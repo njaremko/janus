@@ -73,7 +73,7 @@ unsafeFromOrdinal idx =
     Just m -> m
     Nothing -> error $ "Month index " <> show idx <> " invalid"
 
-monthStartDayOfYear :: Bool -> Month -> Int
+monthStartDayOfYear :: (Integral a) => Bool -> Month -> a
 monthStartDayOfYear isLeapYear month =
   let leapYearAdjustment = if isLeapYear then 1 else 0
    in firstDayOfMonthOfYear month leapYearAdjustment

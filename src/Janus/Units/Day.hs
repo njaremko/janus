@@ -3,8 +3,9 @@ module Janus.Units.Day (Day, mkDay, unsafeMkDay, toInt) where
 import Prelude
 import Data.Ix (Ix)
 import Data.Maybe (fromMaybe)
+import Data.Word (Word8)
 
-newtype Day = Day Int
+newtype Day = Day Word8
   deriving newtype
     ( Show,
       Bounded,
