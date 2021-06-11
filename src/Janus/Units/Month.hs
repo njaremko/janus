@@ -7,7 +7,7 @@ module Janus.Units.Month
     maxLength,
     length,
     plus,
-    minus
+    minus,
   )
 where
 
@@ -72,8 +72,8 @@ unsafeFromOrdinal idx =
     Just m -> m
     Nothing -> error $ "Month index " <> show idx <> " invalid"
 
-monthStartDayOfYear :: Month -> Bool -> Int
-monthStartDayOfYear month isLeapYear =
+monthStartDayOfYear :: Bool -> Month -> Int
+monthStartDayOfYear isLeapYear month =
   let leapYearAdjustment = if isLeapYear then 1 else 0
    in firstDayOfMonthOfYear month leapYearAdjustment
   where
@@ -106,18 +106,18 @@ maxLength September = 30
 maxLength November = 30
 maxLength _ = 31
 
-length :: Month -> Bool -> Int
-length February isLeapYear = if isLeapYear then 29 else 28
-length April _ = 30
-length June _ = 30
-length September _ = 30
-length November _ = 30
+length :: Bool -> Month -> Int
+length isLeapYear February = if isLeapYear then 29 else 28
+length _ April = 30
+length _ June = 30
+length _ September = 30
+length _ November = 30
 length _ _ = 31
 
-plus :: Month -> Int -> Month
-plus month toAdd =
+plus :: Int -> Month -> Month
+plus toAdd month =
   let amount = toAdd `mod` 12
    in unsafeFromOrdinal ((toOrdinal month + amount + 12) `mod` 12)
 
-minus :: Month -> Int -> Month
-minus month toSub = plus month (-(toSub `mod` 12))
+minus :: Int -> Month -> Month
+minus toSub = plus (- (toSub `mod` 12))

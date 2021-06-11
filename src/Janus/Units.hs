@@ -25,7 +25,7 @@ module Janus.Units
     DayOfWeek (..),
     MonthDay,
     Period,
-    EpochSecond (..),
+    EpochSecond (..)
   )
 where
 
@@ -33,6 +33,7 @@ import Data.Int (Int64)
 import Data.Ix (Ix)
 import Prelude
 import Janus.Units.Month (Month)
+import Janus.Units.Year (Year, mkYear)
 
 secondsPerMinute :: Int64
 secondsPerMinute = 60
@@ -63,23 +64,6 @@ nanosPerDay = nanosPerHour * hoursPerDay
 
 -- A date-based amount of time in the ISO-8601 calendar system, such as '2 years, 3 months and 4 days'.
 data Period = Period
-
--- A year in the ISO-8601 calendar system, such as 2007.
-newtype Year = Year Int
-  deriving newtype
-    ( Show,
-      Bounded,
-      Ix,
-      Enum,
-      Num,
-      Eq,
-      Ord,
-      Real,
-      Integral
-    )
-
-mkYear :: Int -> Maybe Year
-mkYear year = if year < 0 then Nothing else Just (Year year)
 
 newtype Day = Day Int
   deriving newtype
