@@ -24,6 +24,9 @@ import qualified Janus.Units.Hour as Hour
 import qualified Janus.Units.Minute as Minute
 import qualified Janus.Units.Second as Second
 import qualified Janus.Units.Year as Year
+import qualified Janus.Units.Nano as Nano
+import qualified Janus.Units.EpochSecond  as EpochSecond
+
 import Prelude
 
 -- An instantaneous point on the time-line.
@@ -39,18 +42,19 @@ now = do
   MkSystemTime seconds nanos <- getSystemTime
   return $
     Instant
-      { seconds = EpochSecond seconds,
-        nanos = fromIntegral nanos
+      { seconds = EpochSecond.mkEpochSecond seconds,
+        nanos = Nano.unsafeMkNano nanos
       }
 
 ofEpochSecond :: EpochSecond -> Instant
-ofEpochSecond seconds = Instant {seconds, nanos = 0}
+ofEpochSecond seconds = Instant {seconds, nanos = Nano.unsafeMkNano @Int 0}
 
 ofEpochMilli :: EpochSecond -> Instant
 ofEpochMilli ms =
-  let seconds = ms `div` 1000
-      mos :: Nano = fromIntegral (ms `mod` 1000)
-   in Instant {seconds, nanos = mos * 1_000_000}
+  let millis = EpochSecond.toInt @Int64 ms
+      seconds = EpochSecond.mkEpochSecond $ millis `div` 1000
+      mos = millis `mod` 1000
+   in Instant {seconds, nanos = Nano.unsafeMkNano $ mos * 1_000_000}
 
 -- >>> mkInstantWithOffset 2020 February 29 6 0 3 0 (-60)
 -- Instant {seconds = 1582955943, nanos = 0}
@@ -59,7 +63,7 @@ mkInstantWithOffset year month day hour minute seconds nanos offsetSeconds =
   let epochDays :: Int64 = epochDaysFromYMD year month day
       epochDaySeconds = secondsPerDay * epochDays
    in Instant
-        { seconds = EpochSecond $ epochDaySeconds + (secondsPerHour * Hour.toInt hour) + (secondsPerMinute * Minute.toInt minute) + Second.toInt seconds + offsetSeconds,
+        { seconds = EpochSecond.mkEpochSecond $ epochDaySeconds + (secondsPerHour * Hour.toInt hour) + (secondsPerMinute * Minute.toInt minute) + Second.toInt seconds + offsetSeconds,
           nanos
         }
 
@@ -87,7 +91,7 @@ epochDaysFromYMD y m d =
 
 toYMD :: Instant -> (Year, Month, Day)
 toYMD Instant {seconds} =
-  let z = seconds + 719468
+  let z = EpochSecond.toInt @Int64 seconds + 719468
       era = (if 0 <= z then z else z - 146096) `div` 146097
       doe = z - era * 146097
       yoe = (doe - doe `div` 1460 + doe `div` 36524 - doe `div` 146096) `div` 365

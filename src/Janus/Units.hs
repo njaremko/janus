@@ -25,12 +25,11 @@ module Janus.Units
     DayOfWeek (..),
     MonthDay,
     Period,
-    EpochSecond (..),
+    EpochSecond,
   )
 where
 
 import Data.Int (Int64)
-import Data.Ix (Ix)
 import Janus.Units.Day (Day, mkDay)
 import Janus.Units.Hour (Hour, mkHour)
 import Janus.Units.Minute (Minute, mkMinute)
@@ -38,7 +37,11 @@ import Janus.Units.Month (Month)
 import Janus.Units.Year (Year, mkYear)
 import Janus.Units.Second (Second, mkSecond)
 import Janus.Units.Nano (Nano, mkNano)
+import Janus.Units.YearMonth (YearMonth)
+import Janus.Units.DayOfWeek (DayOfWeek(..))
+import Janus.Units.MonthDay (MonthDay)
 import Janus.Units.Period (Period)
+import Janus.Units.EpochSecond (EpochSecond)
 import Prelude
 
 secondsPerMinute :: Int64
@@ -78,60 +81,3 @@ nanosPerHour = nanosPerMinute * minutesPerHour
 nanosPerDay :: Int64
 nanosPerDay = nanosPerHour * hoursPerDay
 
-newtype EpochSecond = EpochSecond Int64
-  deriving newtype
-    ( Show,
-      Bounded,
-      Ix,
-      Enum,
-      Num,
-      Eq,
-      Ord,
-      Real,
-      Integral
-    )
-
-
--- A year-month in the ISO-8601 calendar system, such as 2007-12.
-data YearMonth = YearMonth
-  { year :: Year,
-    month :: Month
-  }
-  deriving stock
-    ( Show,
-      Bounded,
-      Ix,
-      Eq,
-      Ord
-    )
-
--- A month-day in the ISO-8601 calendar system, such as --12-03.
-data MonthDay = MonthDay
-  { month :: Month,
-    day :: Int
-  }
-  deriving stock
-    ( Show,
-      Bounded,
-      Ix,
-      Eq,
-      Ord
-    )
-
--- A day-of-week, such as 'Tuesday'.
-data DayOfWeek
-  = Monday
-  | Tuesday
-  | Wednesday
-  | Thursday
-  | Friday
-  | Saturday
-  | Sunday
-  deriving stock
-    ( Show,
-      Bounded,
-      Ix,
-      Enum,
-      Eq,
-      Ord
-    )

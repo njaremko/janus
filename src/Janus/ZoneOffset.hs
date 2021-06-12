@@ -1,5 +1,5 @@
-module Janus.Offset
-  ( Offset,
+module Janus.ZoneOffset
+  ( ZoneOffset,
     ofHours,
     ofHoursMinutesSeconds,
     ofTotalSeconds,
@@ -15,13 +15,12 @@ import Janus.Units
 import Prelude
 
 -- A time-zone offset from Greenwich/UTC, such as +02:00.
-newtype Offset = Offset Int
+newtype ZoneOffset = ZoneOffset Int
   deriving newtype
     ( Show,
       Bounded,
       Ix,
       Enum,
-      Num,
       Eq,
       Ord
     )
@@ -32,9 +31,9 @@ newtype Offset = Offset Int
 -- "+01:00:01"
 -- >>> toString $ Offset (-3601)
 -- "-01:00:01"
-toString :: Offset -> Text
-toString (Offset 0) = "Z"
-toString (Offset totalSeconds) =
+toString :: ZoneOffset -> Text
+toString (ZoneOffset 0) = "Z"
+toString (ZoneOffset totalSeconds) =
   let absTotalSeconds = abs totalSeconds
       absHours = absTotalSeconds `div` 3600
       absMinutes = absTotalSeconds `div` 60 `mod` 60
@@ -49,10 +48,10 @@ toString (Offset totalSeconds) =
           else ""
    in signPortion <> hourPortion <> minutePortion <> secondPortion
 
-ofHours :: Int -> Either Text Offset
+ofHours :: Int -> Either Text ZoneOffset
 ofHours hours = ofHoursMinutesSeconds hours 0 0
 
-ofHoursMinutesSeconds :: Int -> Int -> Int -> Either Text Offset
+ofHoursMinutesSeconds :: Int -> Int -> Int -> Either Text ZoneOffset
 ofHoursMinutesSeconds hours minutes seconds = do
   _ <- v1
   _ <- v2
@@ -88,8 +87,8 @@ ofHoursMinutesSeconds hours minutes seconds = do
             else Left $ "Zone offset seconds not in valid range: value " <> T.pack (show seconds) <> " is not in the range -59 to 59"
         else Left $ "Zone offset minutes not in valid range: value " <> T.pack (show minutes) <> " is not in the range -59 to 59"
 
-ofTotalSeconds :: (Integral a) => a -> Either Text Offset
+ofTotalSeconds :: (Integral a) => a -> Either Text ZoneOffset
 ofTotalSeconds totalSeconds =
   if -64800 <= totalSeconds && totalSeconds <= 64800
-    then Right . Offset $ fromIntegral totalSeconds
+    then Right . ZoneOffset $ fromIntegral totalSeconds
     else Left "Zone offset not in valid range: -18:00 to +18:00"

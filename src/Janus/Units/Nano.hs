@@ -16,7 +16,6 @@ newtype Nano = Nano Int
       Bounded,
       Ix,
       Enum,
-      Num,
       Eq,
       Ord
     )
