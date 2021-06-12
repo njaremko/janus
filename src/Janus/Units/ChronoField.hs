@@ -2,7 +2,9 @@ module Janus.Units.ChronoField
   ( ChronoField (..),
     range,
     baseUnit,
-    rangeUnit
+    rangeUnit,
+    checkValid,
+    isValid
   )
 where
 
@@ -10,6 +12,8 @@ import Data.Int (Int64)
 import Data.Ix (Ix)
 import Janus.Units.ChronoUnit (ChronoUnit (..))
 import Prelude
+import Data.Text (Text)
+import qualified Data.Text as T
 
 data ChronoField
   = NanoOfSecond
@@ -50,6 +54,20 @@ data ChronoField
       Eq,
       Ord
     )
+
+isValid :: (Integral a) => a -> ChronoField -> Bool
+isValid val chronoField =
+  let (minV, maxV) = range chronoField
+      coereced = fromIntegral val
+   in minV <= coereced && coereced <= maxV
+
+checkValid :: (Integral a, Show a) =>  ChronoField -> a -> Either Text ()
+checkValid chronoField val  =
+  let (minV, maxV) = range chronoField
+      coereced = fromIntegral val
+   in if minV <= coereced && coereced <= maxV
+        then Right () 
+        else Left $ "Given value " <> T.pack (show val) <> " is not a valid instance of " <> T.pack (show chronoField)
 
 baseUnit :: ChronoField -> ChronoUnit
 baseUnit NanoOfSecond = Nanos
@@ -94,7 +112,7 @@ rangeUnit SecondOfMinute = Minutes
 rangeUnit SecondOfDay = Days
 rangeUnit MinuteOfHour = Hours
 rangeUnit MinuteOfDay = Days
-rangeUnit HourOfAmPm = HalfDays 
+rangeUnit HourOfAmPm = HalfDays
 rangeUnit ClockHourOfAmPm = HalfDays
 rangeUnit HourOfDay = Days
 rangeUnit ClockHourOfDay = Days
@@ -109,7 +127,7 @@ rangeUnit AlignedWeekOfMonth = Months
 rangeUnit AlignedWeekOfYear = Years
 rangeUnit MonthOfYear = Years
 rangeUnit ProlepticMonth = Forever
-rangeUnit YearOfEra = Forever 
+rangeUnit YearOfEra = Forever
 rangeUnit Year = Forever
 rangeUnit Era = Forever
 rangeUnit InstantSeconds = Forever

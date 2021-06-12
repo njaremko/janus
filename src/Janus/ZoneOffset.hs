@@ -4,6 +4,7 @@ module Janus.ZoneOffset
     ofHoursMinutesSeconds,
     ofTotalSeconds,
     toString,
+    getTotalSeconds
   )
 where
 
@@ -24,6 +25,9 @@ newtype ZoneOffset = ZoneOffset Int
       Eq,
       Ord
     )
+
+getTotalSeconds :: ZoneOffset -> Int
+getTotalSeconds (ZoneOffset x) = x
 
 -- >>> toString $ Offset 3600
 -- "+01:00"

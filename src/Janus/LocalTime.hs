@@ -1,6 +1,10 @@
 module Janus.LocalTime
   ( LocalTime,
     mkLocalTime,
+    getHour,
+    getMinute,
+    getSecond,
+    getNano,
     ofSecondOfDay,
     toSecondOfDay,
     ofNanoOfDay,
@@ -40,6 +44,18 @@ data LocalTime = LocalTime
 
 mkLocalTime :: Hour -> Minute -> Second -> Nano -> LocalTime
 mkLocalTime = LocalTime
+
+getHour :: LocalTime -> Hour 
+getHour = hour
+
+getMinute :: LocalTime -> Minute 
+getMinute = minute
+
+getSecond :: LocalTime -> Second 
+getSecond = second
+
+getNano :: LocalTime -> Nano 
+getNano = nano
 
 withHour :: Hour -> LocalTime -> LocalTime
 withHour hour d = d {hour}
