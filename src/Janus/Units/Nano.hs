@@ -7,8 +7,9 @@ module Janus.Units.Nano
 where
 
 import Data.Ix (Ix)
+import Data.Text (Text)
+import qualified Data.Text as T
 import Prelude
-import Data.Maybe (fromMaybe)
 
 newtype Nano = Nano Int
   deriving newtype
@@ -20,11 +21,16 @@ newtype Nano = Nano Int
       Ord
     )
 
-mkNano :: (Integral a) => a -> Maybe Nano
-mkNano nano = if 0 <= nano && nano <= 999_999_999 then Just (Nano $ fromIntegral nano) else Nothing
+mkNano :: (Integral a, Show a) => a -> Either Text Nano
+mkNano nano =
+  if 0 <= nano && nano <= 999_999_999
+    then Right (Nano $ fromIntegral nano)
+    else Left $ "Given value " <> T.pack (show nano) <> " isn't a valid nanosecond"
 
-unsafeMkNano :: (Integral a) => a -> Nano
-unsafeMkNano nano = fromMaybe (error "") $ mkNano nano
+unsafeMkNano :: (Integral a, Show a) => a -> Nano
+unsafeMkNano nano = case mkNano nano of
+  Right a -> a
+  Left err -> error $ T.unpack err
 
 toInt :: (Integral a) => Nano -> a
 toInt (Nano a) = fromIntegral a

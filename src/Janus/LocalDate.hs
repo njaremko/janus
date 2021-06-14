@@ -112,8 +112,8 @@ resolvePreviousValid :: Year -> Month -> Day -> LocalDate
 resolvePreviousValid y m d =
   let newDayNum :: Int = min (Day.toInt d) (Month.length (Year.isLeapYear y) m)
       newDay = case mkDay newDayNum of
-        Just day -> day
-        Nothing -> error $ "Failed to resolve previously valid day: " <> show newDayNum
+        Right day -> day
+        Left _ -> error $ "Failed to resolve previously valid day: " <> show newDayNum
    in LocalDate y m newDay
 
 -- >>> toEpochDay $ LocalDate 2020 Month.February 29

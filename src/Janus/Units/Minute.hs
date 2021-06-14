@@ -7,8 +7,9 @@ module Janus.Units.Minute
 where
 
 import Data.Ix (Ix)
+import Data.Text (Text)
+import qualified Data.Text as T
 import Prelude
-import Data.Maybe (fromMaybe)
 
 newtype Minute = Minute Int
   deriving newtype
@@ -21,11 +22,16 @@ newtype Minute = Minute Int
       Ord
     )
 
-mkMinute :: (Integral a) => a -> Maybe Minute
-mkMinute minute = if 0 <= minute && minute <= 59 then Just (Minute $ fromIntegral minute) else Nothing
+mkMinute :: (Integral a, Show a) => a -> Either Text Minute
+mkMinute minute =
+  if 0 <= minute && minute <= 59
+    then Right (Minute $ fromIntegral minute)
+    else Left $ "Given value " <> T.pack (show minute) <> " isn't a valid minute"
 
-unsafeMkMinute :: (Integral a) => a -> Minute
-unsafeMkMinute minute = fromMaybe (error "") $ mkMinute minute
+unsafeMkMinute :: (Integral a, Show a) => a -> Minute
+unsafeMkMinute minute = case mkMinute minute of
+  Right a -> a
+  Left err -> error $ T.unpack err
 
 toInt :: (Integral a) => Minute -> a
 toInt (Minute a) = fromIntegral a

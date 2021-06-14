@@ -8,6 +8,7 @@ where
 import Data.Ix (Ix)
 import Data.Text (Text)
 import Prelude
+import qualified Data.Text as T
 
 -- A day-of-week, such as 'Tuesday'.
 data DayOfWeek
@@ -39,12 +40,6 @@ mkDayOfWeek dayOfWeek = case dayOfWeek of
   _ -> Left ""
 
 unsafeMkDayOfWeek :: (Integral a) => a -> DayOfWeek
-unsafeMkDayOfWeek dayOfWeek = case dayOfWeek of
-  1 ->  Monday
-  2 ->  Tuesday
-  3 ->  Wednesday
-  4 ->  Thursday
-  5 ->  Friday
-  6 ->  Saturday
-  7 ->  Sunday
-  _ -> error ""
+unsafeMkDayOfWeek dayOfWeek = case mkDayOfWeek dayOfWeek of
+  Right a -> a
+  Left err -> error $ T.unpack err
