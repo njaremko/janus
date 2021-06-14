@@ -74,6 +74,9 @@ library
                     ,  Janus.Units.YearMonth
                     ,  Janus.ZoneOffset
                     ,  Janus.ZonedDateTime
+                    , Janus.Units.ChronoField
+                    , Janus.Units.ChronoUnit
+                    , Janus.Units.EpochSecond
 
 executable janus
   import:              common-options

@@ -2,39 +2,51 @@ module Janus.LocalDate
   ( LocalDate,
     mkLocalDate,
     ofYearDay,
-    withDay,
+    withDayOfMonth,
+    withDayOfYear,
     withMonth,
     withYear,
     toEpochDay,
     ofEpochDay,
+    lengthOfYear,
     lengthOfMonth,
     plusDays,
     plusWeeks,
     plusMonths,
     plusYears,
+    getYear,
+    getMonth,
+    getDayOfMonth,
+    getDayOfYear,
+    getDayOfWeek,
   )
 where
 
 import Data.Int (Int64)
+import Data.Ix (Ix)
+import Data.Text (Text)
 import Janus.Units
+import qualified Janus.Units.ChronoField as ChronoField
 import qualified Janus.Units.Day as Day
+import qualified Janus.Units.DayOfWeek as DayOfWeek
 import qualified Janus.Units.Month as Month
 import qualified Janus.Units.Year as Year
 import Prelude
-import Data.Ix (Ix)
 
 -- A date without a time-zone in the ISO-8601 calendar system, such as 2007-12-03.
 data LocalDate = LocalDate
   { year :: Year,
     month :: Month,
     day :: Day
-  } deriving stock (Show, Eq, Ord, Bounded, Ix)
+  }
+  deriving stock (Show, Eq, Ord, Bounded, Ix)
 
 mkLocalDate :: Year -> Month -> Day -> LocalDate
 mkLocalDate = LocalDate
 
-ofYearDay :: Year -> Int -> Maybe LocalDate
+ofYearDay :: Year -> Int -> Either Text LocalDate
 ofYearDay year dayOfYear = do
+  _ <- ChronoField.checkValid ChronoField.DayOfYear dayOfYear
   moy <- Month.fromOrdinal ((dayOfYear - 1) `div` 31 + 1)
   let isLeap = Year.isLeapYear year
       monthEnd = Month.monthStartDayOfYear isLeap moy + Month.length isLeap moy - 1
@@ -42,8 +54,23 @@ ofYearDay year dayOfYear = do
       dom = dayOfYear - Month.monthStartDayOfYear isLeap adjustedMOY + 1
   return LocalDate {year, month = moy, day = fromIntegral dom}
 
-withDay :: Day -> LocalDate -> LocalDate
-withDay day date = date {day}
+getYear :: LocalDate -> Year
+getYear LocalDate {year} = year
+
+getMonth :: LocalDate -> Month
+getMonth LocalDate {month} = month
+
+getDayOfMonth :: LocalDate -> Day
+getDayOfMonth LocalDate {day} = day
+
+withDayOfMonth :: Day -> LocalDate -> LocalDate
+withDayOfMonth day date = date {day}
+
+withDayOfYear :: Int -> LocalDate -> Either Text LocalDate
+withDayOfYear dayOfYear date@LocalDate {year} =
+  if getDayOfYear date == dayOfYear
+    then Right date
+    else ofYearDay year dayOfYear
 
 withMonth :: Month -> LocalDate -> LocalDate
 withMonth month date = date {month}
@@ -136,3 +163,14 @@ ofEpochDay epochDay =
 
 lengthOfMonth :: LocalDate -> Int
 lengthOfMonth LocalDate {year, month} = Month.length (Year.isLeapYear year) month
+
+lengthOfYear :: LocalDate -> Int
+lengthOfYear LocalDate {year} = if Year.isLeapYear year then 366 else 365
+
+getDayOfYear :: LocalDate -> Int
+getDayOfYear LocalDate {year, month, day} = Month.monthStartDayOfYear (Year.isLeapYear year) month + Day.toInt day - 1
+
+getDayOfWeek :: LocalDate -> DayOfWeek
+getDayOfWeek date =
+  let dow0 = (toEpochDay date + 3) `mod` 7
+   in DayOfWeek.unsafeMkDayOfWeek dow0

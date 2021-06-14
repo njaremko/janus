@@ -14,6 +14,8 @@ where
 
 import Data.Ix (Ix)
 import Prelude hiding (length)
+import Data.Text (Text)
+import qualified Data.Text as T
 
 -- A month-of-year, such as 'July'.
 data Month
@@ -52,26 +54,26 @@ toOrdinal October = 10
 toOrdinal November = 11
 toOrdinal December = 12
 
-fromOrdinal :: (Integral a) => a -> Maybe Month
-fromOrdinal 1 = Just January
-fromOrdinal 2 = Just February
-fromOrdinal 3 = Just March
-fromOrdinal 4 = Just April
-fromOrdinal 5 = Just May
-fromOrdinal 6 = Just June
-fromOrdinal 7 = Just July
-fromOrdinal 8 = Just August
-fromOrdinal 9 = Just September
-fromOrdinal 10 = Just October
-fromOrdinal 11 = Just November
-fromOrdinal 12 = Just December
-fromOrdinal _ = Nothing
+fromOrdinal :: (Integral a, Show a) => a -> Either Text Month
+fromOrdinal 1 = Right January
+fromOrdinal 2 = Right February
+fromOrdinal 3 = Right March
+fromOrdinal 4 = Right April
+fromOrdinal 5 = Right May
+fromOrdinal 6 = Right June
+fromOrdinal 7 = Right July
+fromOrdinal 8 = Right August
+fromOrdinal 9 = Right September
+fromOrdinal 10 = Right October
+fromOrdinal 11 = Right November
+fromOrdinal 12 = Right December
+fromOrdinal idx = Left $ "Month index " <> T.pack (show idx) <> " invalid"
 
 unsafeFromOrdinal :: (Integral a, Show a) => a -> Month
 unsafeFromOrdinal idx =
   case fromOrdinal idx of
-    Just m -> m
-    Nothing -> error $ "Month index " <> show idx <> " invalid"
+    Right m -> m
+    Left err -> error $ T.unpack err
 
 monthStartDayOfYear :: (Integral a) => Bool -> Month -> a
 monthStartDayOfYear isLeapYear month =

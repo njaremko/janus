@@ -142,7 +142,7 @@ parseIso8601 = do
   (s, nanos) <- option (0, 0) (char ':' *> parseSeconds)
   offset <- timeZone
   case (mkYear y, Month.fromOrdinal m, mkDay d, mkHour h, mkMinute minutes, mkSecond s, mkNano nanos) of
-    (Just year, Just month, Just day, Just hour, Just minute, Just second, Just ns) ->
+    (Just year, Right month, Just day, Just hour, Just minute, Just second, Just ns) ->
       return $
         mkInstantWithOffset
           year
