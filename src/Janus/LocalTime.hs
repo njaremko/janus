@@ -5,9 +5,9 @@ module Janus.LocalTime
     getMinute,
     getSecond,
     getNano,
-    ofSecondOfDay,
+    fromSecondOfDay,
     toSecondOfDay,
-    ofNanoOfDay,
+    fromNanoOfDay,
     toNanoOfDay,
     withHour,
     withMinute,
@@ -45,16 +45,16 @@ data LocalTime = LocalTime
 mkLocalTime :: Hour -> Minute -> Second -> Nano -> LocalTime
 mkLocalTime = LocalTime
 
-getHour :: LocalTime -> Hour 
+getHour :: LocalTime -> Hour
 getHour = hour
 
-getMinute :: LocalTime -> Minute 
+getMinute :: LocalTime -> Minute
 getMinute = minute
 
-getSecond :: LocalTime -> Second 
+getSecond :: LocalTime -> Second
 getSecond = second
 
-getNano :: LocalTime -> Nano 
+getNano :: LocalTime -> Nano
 getNano = nano
 
 withHour :: Hour -> LocalTime -> LocalTime
@@ -73,8 +73,8 @@ toSecondOfDay :: LocalTime -> Int64
 toSecondOfDay LocalTime {hour, minute, second} =
   Hour.toInt hour * 3600 + Minute.toInt minute * 60 + Second.toInt second
 
-ofSecondOfDay :: Int64 -> LocalTime
-ofSecondOfDay secondOfDay =
+fromSecondOfDay :: Int64 -> LocalTime
+fromSecondOfDay secondOfDay =
   let hours = secondOfDay `div` 3600
       sod2 = secondOfDay - (hours * 3600)
       minutes = sod2 `div` 60
@@ -92,8 +92,8 @@ toNanoOfDay LocalTime {hour, minute, second, nano} =
     + (Second.toInt second * nanosPerSecond)
     + Nano.toInt nano
 
-ofNanoOfDay :: Int64 -> LocalTime
-ofNanoOfDay nanoOfDay =
+fromNanoOfDay :: Int64 -> LocalTime
+fromNanoOfDay nanoOfDay =
   let hours = nanoOfDay `div` 3600000000000
       nod2 = nanoOfDay - (hours * 3600000000000)
       minutes = nod2 `div` 60000000000

@@ -12,14 +12,17 @@ module Janus.LocalDateTime
     getNano,
     now,
     fromUtcTime,
+    fromSystemTime,
   )
 where
 
+import Data.Either (fromRight)
 import Data.Int (Int64)
 import Data.Ix (Ix)
 import Data.Text (Text)
-import Data.Time (UTCTime, getCurrentTime)
-import qualified Date.Time as Time
+import Data.Time (UTCTime)
+import Data.Time.Clock.System (SystemTime (..))
+import qualified Data.Time.Clock.System as SystemTime
 import Janus.LocalDate (LocalDate)
 import qualified Janus.LocalDate as LocalDate
 import Janus.LocalTime (LocalTime)
@@ -41,10 +44,15 @@ mkLocalDateTime :: LocalDate -> LocalTime -> LocalDateTime
 mkLocalDateTime = LocalDateTime
 
 fromUtcTime :: UTCTime -> LocalDateTime
-fromUtcTime x = error ""
+fromUtcTime = fromSystemTime . SystemTime.utcToSystemTime
+
+fromSystemTime :: SystemTime -> LocalDateTime
+fromSystemTime MkSystemTime {systemSeconds, systemNanoseconds} = do
+  fromRight (error "Failed to convert system time to local date time") $
+    ofEpochSecond systemSeconds (fromIntegral systemNanoseconds) ZoneOffset.utcZoneOffset
 
 now :: IO LocalDateTime
-now = fromUtcTime <$> getCurrentTime
+now = fromSystemTime <$> SystemTime.getSystemTime
 
 ofEpochSecond :: Int64 -> Int -> ZoneOffset -> Either Text LocalDateTime
 ofEpochSecond epochSecond nanoOfSecond offset = do
@@ -52,8 +60,8 @@ ofEpochSecond epochSecond nanoOfSecond offset = do
   let localSecond = epochSecond + fromIntegral (ZoneOffset.getTotalSeconds offset)
       localEpochDay = localSecond `div` 86400
       secsOfDay = localSecond `mod` 86400
-      date = LocalDate.ofEpochDay localEpochDay
-      time = LocalTime.ofNanoOfDay (secsOfDay * 1000000000 + fromIntegral nanoOfSecond)
+      date = LocalDate.fromEpochDay localEpochDay
+      time = LocalTime.fromNanoOfDay (secsOfDay * 1000000000 + fromIntegral nanoOfSecond)
   Right $ mkLocalDateTime date time
 
 getYear :: LocalDateTime -> Year

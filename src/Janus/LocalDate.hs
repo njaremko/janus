@@ -7,7 +7,7 @@ module Janus.LocalDate
     withMonth,
     withYear,
     toEpochDay,
-    ofEpochDay,
+    fromEpochDay,
     lengthOfYear,
     lengthOfMonth,
     plusDays,
@@ -19,18 +19,28 @@ module Janus.LocalDate
     getDayOfMonth,
     getDayOfYear,
     getDayOfWeek,
+    now,
+    fromUtcTime,
+    fromSystemTime,
+    fromEpochSecond,
   )
 where
 
+import Data.Either (fromRight)
 import Data.Int (Int64)
 import Data.Ix (Ix)
 import Data.Text (Text)
+import Data.Time (UTCTime)
+import Data.Time.Clock.System (SystemTime (..))
+import qualified Data.Time.Clock.System as SystemTime
 import Janus.Units
 import qualified Janus.Units.ChronoField as ChronoField
 import qualified Janus.Units.Day as Day
 import qualified Janus.Units.DayOfWeek as DayOfWeek
 import qualified Janus.Units.Month as Month
 import qualified Janus.Units.Year as Year
+import Janus.ZoneOffset (ZoneOffset)
+import qualified Janus.ZoneOffset as ZoneOffset
 import Prelude
 
 -- A date without a time-zone in the ISO-8601 calendar system, such as 2007-12-03.
@@ -91,7 +101,7 @@ plusDays days date@LocalDate {year, month, day} =
                   if Month.toOrdinal @Int month < 12
                     then date {month = Month.plus @Int 1 month, day = fromIntegral (dom - monthLen)}
                     else date {year = year + 1, month = Month.January, day = fromIntegral (dom - monthLen)}
-        else ofEpochDay (toEpochDay date + fromIntegral days)
+        else fromEpochDay (toEpochDay date + fromIntegral days)
 
 plusWeeks :: Int -> LocalDate -> LocalDate
 plusWeeks weeks = plusDays (weeks * 7)
@@ -139,8 +149,8 @@ toEpochDay LocalDate {year, month, day} =
           else x4
    in fromIntegral x5 - 719528
 
-ofEpochDay :: Int64 -> LocalDate
-ofEpochDay epochDay =
+fromEpochDay :: Int64 -> LocalDate
+fromEpochDay epochDay =
   let zeroDay = epochDay + 719528 - 60
       (yearEst, adjust, zeroDay2) =
         if zeroDay < 0
@@ -174,3 +184,22 @@ getDayOfWeek :: LocalDate -> DayOfWeek
 getDayOfWeek date =
   let dow0 = (toEpochDay date + 3) `mod` 7
    in DayOfWeek.unsafeMkDayOfWeek dow0
+
+fromUtcTime :: UTCTime -> LocalDate
+fromUtcTime = fromSystemTime . SystemTime.utcToSystemTime
+
+fromSystemTime :: SystemTime -> LocalDate
+fromSystemTime MkSystemTime {systemSeconds, systemNanoseconds} = do
+  fromRight (error "Failed to convert system time to local date") $
+    fromEpochSecond systemSeconds (fromIntegral systemNanoseconds) ZoneOffset.utcZoneOffset
+
+now :: IO LocalDate
+now = fromSystemTime <$> SystemTime.getSystemTime
+
+fromEpochSecond :: Int64 -> Int -> ZoneOffset -> Either Text LocalDate
+fromEpochSecond epochSecond nanoOfSecond offset = do
+  _ <- ChronoField.checkValid ChronoField.NanoOfSecond nanoOfSecond
+  let localSecond = epochSecond + fromIntegral (ZoneOffset.getTotalSeconds offset)
+      localEpochDay = localSecond `div` 86400
+      date = fromEpochDay localEpochDay
+  Right date
