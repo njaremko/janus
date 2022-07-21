@@ -19,6 +19,7 @@
         ];
         pkgs = import nixpkgs { inherit system overlays; };
         flake = pkgs.janus.flake { };
+        index-state = "2022-07-21T00:00:00Z";
       in
       flake // {
         # Built by `nix build .`
@@ -28,10 +29,10 @@
         # `cabal`, `hlint` and `haskell-language-server`
         devShell = pkgs.janus.shellFor {
           tools = {
-            cabal = { version = "latest"; index-state = "2022-07-21T00:00:00Z"; materialized = ./.nix/cabal.materialized; };
-            hlint = { version = "latest"; index-state = "2022-07-21T00:00:00Z"; materialized = ./.nix/hlint.materialized; };
-            haskell-language-server = { version = "latest"; index-state = "2022-07-21T00:00:00Z"; materialized = ./.nix/haskell-language-server.materialized; };
-            hoogle = { version = "latest"; index-state = "2022-07-21T00:00:00Z"; materialized = ./.nix/hoogle.materialized; };
+            cabal = { inherit index-state; version = "latest"; materialized = ./.nix/cabal.materialized; };
+            hlint = { inherit index-state; version = "latest"; materialized = ./.nix/hlint.materialized; };
+            haskell-language-server = { inherit index-state; version = "latest"; materialized = ./.nix/haskell-language-server.materialized; };
+            hoogle = { inherit index-state; version = "latest"; materialized = ./.nix/hoogle.materialized; };
           };
         };
       });

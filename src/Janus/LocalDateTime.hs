@@ -9,13 +9,17 @@ module Janus.LocalDateTime
     getHour,
     getMinute,
     getSecond,
-    getNano
+    getNano,
+    now,
+    fromUtcTime,
   )
 where
 
 import Data.Int (Int64)
 import Data.Ix (Ix)
 import Data.Text (Text)
+import Data.Time (UTCTime, getCurrentTime)
+import qualified Date.Time as Time
 import Janus.LocalDate (LocalDate)
 import qualified Janus.LocalDate as LocalDate
 import Janus.LocalTime (LocalTime)
@@ -35,6 +39,12 @@ data LocalDateTime = LocalDateTime
 
 mkLocalDateTime :: LocalDate -> LocalTime -> LocalDateTime
 mkLocalDateTime = LocalDateTime
+
+fromUtcTime :: UTCTime -> LocalDateTime
+fromUtcTime x = error ""
+
+now :: IO LocalDateTime
+now = fromUtcTime <$> getCurrentTime
 
 ofEpochSecond :: Int64 -> Int -> ZoneOffset -> Either Text LocalDateTime
 ofEpochSecond epochSecond nanoOfSecond offset = do

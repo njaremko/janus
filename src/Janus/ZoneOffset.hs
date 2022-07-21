@@ -4,16 +4,20 @@ module Janus.ZoneOffset
     ofHoursMinutesSeconds,
     ofTotalSeconds,
     toString,
-    getTotalSeconds
+    getTotalSeconds,
+    utcZoneOffset,
+    minZoneOffset,
+    maxZoneOffset,
   )
 where
 
 import Data.Bits ((.|.))
+import Data.Either (fromRight)
 import Data.Ix (Ix)
 import Data.Text (Text)
 import qualified Data.Text as T
 import Janus.Units
-import Prelude
+import Prelude hiding (max, min)
 
 -- A time-zone offset from Greenwich/UTC, such as +02:00.
 newtype ZoneOffset = ZoneOffset Int
@@ -25,6 +29,15 @@ newtype ZoneOffset = ZoneOffset Int
       Eq,
       Ord
     )
+
+utcZoneOffset :: ZoneOffset
+utcZoneOffset = fromRight (error "Failed to construct UTC zone offset") $ ofTotalSeconds (0 :: Int)
+
+maxZoneOffset :: ZoneOffset
+maxZoneOffset = fromRight (error "Failed to construct UTC zone offset") $ ofTotalSeconds (64800 :: Int)
+
+minZoneOffset :: ZoneOffset
+minZoneOffset = fromRight (error "Failed to construct UTC zone offset") $ ofTotalSeconds (-64800 :: Int)
 
 getTotalSeconds :: ZoneOffset -> Int
 getTotalSeconds (ZoneOffset x) = x

@@ -26,23 +26,38 @@ module Janus.Units
     MonthDay,
     Period,
     EpochSecond,
+    Unit (..),
   )
 where
 
 import Data.Int (Int64)
 import Janus.Units.Day (Day, mkDay)
+import Janus.Units.DayOfWeek (DayOfWeek (..))
+import Janus.Units.EpochSecond (EpochSecond)
 import Janus.Units.Hour (Hour, mkHour)
 import Janus.Units.Minute (Minute, mkMinute)
 import Janus.Units.Month (Month)
-import Janus.Units.Year (Year, mkYear)
-import Janus.Units.Second (Second, mkSecond)
-import Janus.Units.Nano (Nano, mkNano)
-import Janus.Units.YearMonth (YearMonth)
-import Janus.Units.DayOfWeek (DayOfWeek(..))
 import Janus.Units.MonthDay (MonthDay)
+import Janus.Units.Nano (Nano, mkNano)
 import Janus.Units.Period (Period)
-import Janus.Units.EpochSecond (EpochSecond)
+import Janus.Units.Second (Second, mkSecond)
+import Janus.Units.Year (Year, mkYear)
+import Janus.Units.YearMonth (YearMonth)
 import Prelude
+
+data Unit
+  = Day Day
+  | DayOfWeek DayOfWeek
+  | EpochSecond EpochSecond
+  | Hour Hour
+  | Minute Minute
+  | Month Month
+  | MonthDay MonthDay
+  | Second Second
+  | Nano Nano
+  | Period Period
+  | Year Year
+  | YearMonth YearMonth
 
 secondsPerMinute :: Int64
 secondsPerMinute = 60
@@ -80,4 +95,3 @@ nanosPerHour = nanosPerMinute * minutesPerHour
 -- 86400000000000
 nanosPerDay :: Int64
 nanosPerDay = nanosPerHour * hoursPerDay
-

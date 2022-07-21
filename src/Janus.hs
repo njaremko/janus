@@ -5,16 +5,30 @@
 --
 -- See README for more info
 module Janus
-  ( someFunc,
+  ( module Janus.Units,
+    LocalDate,
+    LocalDateTime,
+    OffsetDateTime,
+    ZoneOffset,
+    ZonedDateTime,
+    OffsetTime,
+    TimeZone,
+    LocalTime,
+    Instant,
+    Duration,
+    module Janus.Temporal,
   )
 where
 
-import Prelude
 import Janus.Duration (Duration)
-import qualified Janus.Duration as Duration
-
-someFunc :: IO ()
-someFunc = do
-       let x1 = Duration.ofDays 1
-       let x2 = Duration.ofDays 3
-       putStrLn ("someFunc" :: String)
+import Janus.Instant (Instant)
+import Janus.LocalDate (LocalDate)
+import Janus.LocalDateTime (LocalDateTime)
+import Janus.LocalTime (LocalTime)
+import Janus.OffsetDateTime (OffsetDateTime)
+import Janus.OffsetTime (OffsetTime)
+import Janus.Temporal
+import Janus.TimeZone (TimeZone)
+import Janus.Units
+import Janus.ZoneOffset (ZoneOffset)
+import Janus.ZonedDateTime (ZonedDateTime)
