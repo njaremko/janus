@@ -1,6 +1,6 @@
-module Janus.TimeZone where
+module Janus.TimeZone (TimeZone) where
 
-import Prelude 
+import Prelude
 
 -- A time-zone, such as Europe/Paris.
 data TimeZone = TimeZone

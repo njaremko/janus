@@ -26,6 +26,7 @@ module Janus.Units
     MonthDay,
     Period,
     EpochSecond,
+    EpochDay,
     Unit (..),
   )
 where
@@ -33,6 +34,7 @@ where
 import Data.Int (Int64)
 import Janus.Units.Day (Day, mkDay)
 import Janus.Units.DayOfWeek (DayOfWeek (..))
+import Janus.Units.EpochDay (EpochDay)
 import Janus.Units.EpochSecond (EpochSecond)
 import Janus.Units.Hour (Hour, mkHour)
 import Janus.Units.Minute (Minute, mkMinute)

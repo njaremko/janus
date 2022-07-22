@@ -6,19 +6,23 @@ module Janus.Units.Nano
   )
 where
 
+import Data.Int (Int64)
 import Data.Ix (Ix)
 import Data.Text (Text)
 import qualified Data.Text as T
 import Prelude
 
-newtype Nano = Nano Int
+newtype Nano = Nano Int64
   deriving newtype
     ( Show,
       Bounded,
       Ix,
       Enum,
       Eq,
-      Ord
+      Ord,
+      Num,
+      Integral,
+      Real
     )
 
 mkNano :: (Integral a, Show a) => a -> Either Text Nano

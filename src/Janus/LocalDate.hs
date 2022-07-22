@@ -26,6 +26,7 @@ module Janus.LocalDate
   )
 where
 
+import Data.Coerce (coerce)
 import Data.Either (fromRight)
 import Data.Int (Int64)
 import Data.Ix (Ix)
@@ -37,6 +38,7 @@ import Janus.Units
 import qualified Janus.Units.ChronoField as ChronoField
 import qualified Janus.Units.Day as Day
 import qualified Janus.Units.DayOfWeek as DayOfWeek
+import qualified Janus.Units.EpochSecond as EpochSecond
 import qualified Janus.Units.Month as Month
 import qualified Janus.Units.Year as Year
 import Janus.ZoneOffset (ZoneOffset)
@@ -130,7 +132,7 @@ resolvePreviousValid y m d =
 -- 18321
 -- >>> toEpochDay $ LocalDate (-500) Month.January 5
 -- -902145
-toEpochDay :: LocalDate -> Int64
+toEpochDay :: LocalDate -> EpochDay
 toEpochDay LocalDate {year, month, day} =
   let y :: Int = Year.toInt year
       x1 = 365 * y
@@ -149,7 +151,7 @@ toEpochDay LocalDate {year, month, day} =
           else x4
    in fromIntegral x5 - 719528
 
-fromEpochDay :: Int64 -> LocalDate
+fromEpochDay :: EpochDay -> LocalDate
 fromEpochDay epochDay =
   let zeroDay = epochDay + 719528 - 60
       (yearEst, adjust, zeroDay2) =
@@ -191,15 +193,15 @@ fromUtcTime = fromSystemTime . SystemTime.utcToSystemTime
 fromSystemTime :: SystemTime -> LocalDate
 fromSystemTime MkSystemTime {systemSeconds, systemNanoseconds} = do
   fromRight (error "Failed to convert system time to local date") $
-    fromEpochSecond systemSeconds (fromIntegral systemNanoseconds) ZoneOffset.utcZoneOffset
+    fromEpochSecond (EpochSecond.mkEpochSecond systemSeconds) (fromIntegral systemNanoseconds) ZoneOffset.utcZoneOffset
 
 now :: IO LocalDate
 now = fromSystemTime <$> SystemTime.getSystemTime
 
-fromEpochSecond :: Int64 -> Int -> ZoneOffset -> Either Text LocalDate
+fromEpochSecond :: EpochSecond -> Nano -> ZoneOffset -> Either Text LocalDate
 fromEpochSecond epochSecond nanoOfSecond offset = do
   _ <- ChronoField.checkValid ChronoField.NanoOfSecond nanoOfSecond
   let localSecond = epochSecond + fromIntegral (ZoneOffset.getTotalSeconds offset)
-      localEpochDay = localSecond `div` 86400
+      localEpochDay = EpochSecond.toInt localSecond `div` 86400
       date = fromEpochDay localEpochDay
   Right date

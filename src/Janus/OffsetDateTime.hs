@@ -8,6 +8,7 @@ module Janus.OffsetDateTime
     getMinute,
     getSecond,
     getNano,
+    now,
   )
 where
 
@@ -27,6 +28,11 @@ data OffsetDateTime = OffsetDateTime
 
 mkOffsetDateTime :: LocalDateTime -> ZoneOffset -> OffsetDateTime
 mkOffsetDateTime = OffsetDateTime
+
+now :: ZoneOffset -> IO OffsetDateTime
+now offset = do
+  dateTime <- LocalDateTime.now
+  pure $ OffsetDateTime dateTime offset
 
 getYear :: OffsetDateTime -> Year
 getYear OffsetDateTime {dateTime} = LocalDateTime.getYear dateTime

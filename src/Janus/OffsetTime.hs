@@ -19,14 +19,17 @@ module Janus.OffsetTime
     minusSeconds,
     minusNanos,
     toEpochNano,
-    toEpochSecond
+    toEpochSecond,
   )
 where
 
 import Data.Int (Int64)
 import Data.Ix (Ix)
+import Janus.LocalDate (LocalDate)
+import qualified Janus.LocalDate as LocalDate
 import Janus.LocalTime (LocalTime)
 import qualified Janus.LocalTime as LocalTime
+import qualified Janus.Units.EpochDay as EpochDay
 import Janus.Units.Hour (Hour)
 import qualified Janus.Units.Hour as Hour
 import Janus.Units.Minute (Minute)
@@ -38,8 +41,6 @@ import qualified Janus.Units.Second as Second
 import Janus.ZoneOffset (ZoneOffset)
 import qualified Janus.ZoneOffset as ZoneOffset
 import Prelude
-import Janus.LocalDate (LocalDate)
-import qualified Janus.LocalDate as LocalDate
 
 -- A time with an offset from UTC/Greenwich in the ISO-8601 calendar system, such as 10:15:30+01:00.
 data OffsetTime = OffsetTime
@@ -55,19 +56,19 @@ data OffsetTime = OffsetTime
     )
 
 getHour :: OffsetTime -> Hour
-getHour OffsetTime{time} = LocalTime.getHour time
+getHour OffsetTime {time} = LocalTime.getHour time
 
 getMinute :: OffsetTime -> Minute
-getMinute OffsetTime{time} = LocalTime.getMinute time
+getMinute OffsetTime {time} = LocalTime.getMinute time
 
 getSecond :: OffsetTime -> Second
-getSecond OffsetTime{time} = LocalTime.getSecond time
+getSecond OffsetTime {time} = LocalTime.getSecond time
 
 getNano :: OffsetTime -> Nano
-getNano OffsetTime{time} = LocalTime.getNano time
+getNano OffsetTime {time} = LocalTime.getNano time
 
 getOffset :: OffsetTime -> ZoneOffset
-getOffset OffsetTime{offset} = offset
+getOffset OffsetTime {offset} = offset
 
 mkOffsetTime :: LocalTime -> ZoneOffset -> OffsetTime
 mkOffsetTime = OffsetTime
@@ -114,8 +115,8 @@ toEpochNano OffsetTime {time, offset} =
       offsetNanos = fromIntegral $ ZoneOffset.getTotalSeconds offset * 1_000_000_000
    in nod - offsetNanos
 
-toEpochSecond:: LocalDate -> OffsetTime -> Int64
+toEpochSecond :: LocalDate -> OffsetTime -> Int64
 toEpochSecond ld OffsetTime {time, offset} =
-  let epochDay = LocalDate.toEpochDay ld
+  let epochDay = EpochDay.toInt $ LocalDate.toEpochDay ld
       secs = epochDay * 86400 + LocalTime.toSecondOfDay time
    in secs - fromIntegral (ZoneOffset.getTotalSeconds offset)

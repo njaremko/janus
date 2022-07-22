@@ -16,7 +16,10 @@ newtype EpochSecond = EpochSecond Int64
       Ix,
       Enum,
       Eq,
-      Ord
+      Ord,
+      Num,
+      Integral,
+      Real
     )
 
 mkEpochSecond :: (Integral a) => a -> EpochSecond
